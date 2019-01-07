@@ -1,0 +1,61 @@
+<html>
+<head>
+  <title>Play Thud!</title>
+  <link rel="icon" href="thurisaz-100x100.png"/>
+
+  <link type="text/css" rel="stylesheet" href="main.css"/>
+  <link type="text/css" rel="stylesheet" href="bootstrap.min.css"/>
+  <link type="text/css" rel="stylesheet" href="bootstrap-vue.css"/>
+
+  <script src="vue.js"></script>
+  <script src="bootstrap-vue.js"></script>
+
+  <script src="jdenticon.min.js"></script>
+  <script>
+    window.jdenticon_config = {
+      lightness: {
+        color: [0.33, 0.67],
+        grayscale: [0.17, 0.67],
+      },
+      saturation: {
+        color: 1.0,
+        grayscale: 0.0,
+      },
+      backColor: "#ffffff"
+    };
+  </script>
+
+  <script src="sodium.js"></script>
+  <script src="zxcvbn.js"></script>
+
+  <script src="moment.js"></script>
+  <script src="moment-timezone-with-data.js"></script>
+
+  <script src="app.js"></script>
+  <script>
+    window.onload = function (e) {
+      app.$mount(document.getElementById("app"));
+    }
+  </script>
+</head>
+
+<body>
+<div id="app" v-cloak>
+  <div class="thudboard">
+    <table>
+      <thead><tr>
+        <th>&THORN;</th>
+        <th v-for="COL in COLS">{{COL}}</th>
+      </tr></thead>
+      <tbody>
+        <tr v-for="(row,y) in thudboard">
+          <th>{{y+1}}</th>
+          <td v-for="cell in row">{{cell}}</td>
+        </tr>
+      </tbody>
+    </table>
+    It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.
+  </div>
+</div>
+</body>
+</html>
