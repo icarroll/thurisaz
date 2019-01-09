@@ -56,7 +56,8 @@
               v-on:click="click(x,y)"
               v-bind:class="{selectable:selectable(x,y),
                              selected:selected(x,y),
-                             isattack:isattack(x,y)}">
+                             isattack:isattack(x,y),
+                             absent:cell=='#'}">
             <span v-if="cell==' ' && selectable(x,y)" class="dot"></span>
             <span v-else>{{cell}}</span>
           </td>

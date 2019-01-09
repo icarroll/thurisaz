@@ -8,6 +8,26 @@ div.thudboard tr td {
   font-weight: bold; /* not sure about this */
 }
 
+div.thudboard tr td.absent {
+  visibility: hidden;
+}
+
+div.thudboard tr th~td:not(.absent) {
+  border-left: 1px solid #bfbfbf;
+}
+
+div.thudboard tr td:last-child {
+  border-right: 1px solid #bfbfbf;
+}
+
+div.thudboard tr:first-child td:not(.absent) {
+  border-top: 1px solid #bfbfbf;
+}
+
+div.thudboard tr:last-child td {
+  border-bottom: 1px solid #bfbfbf;
+}
+
 div.thudboard tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
   background-color: #bfbfbf;
 }
