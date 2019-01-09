@@ -52,8 +52,11 @@
           <th>{{y+1}}</th>
           <!-- <td v-for="(cell,x) in row"
               v-bind:class="{glow:isdwarfturn&&cell=='d'||!isdwarfturn&&cell=='T'}"> -->
-          <td v-for="(cell,x) in row" v-bind:class="{glow:x==11&&y==2}">
-            <span v-if="cell=='.'" class="dot"></span>
+          <td v-for="(cell,x) in row"
+              v-bind:class="{selectable:selectable(x,y),
+                             selected:selected(x,y),
+                             isattack:isattack(x,y)}">
+            <span v-if="cell==' ' && selectable(x,y)" class="greendot"></span>
             <span v-else>{{cell}}</span>
           </td>
         </tr>
