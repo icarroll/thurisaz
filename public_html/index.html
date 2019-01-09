@@ -50,11 +50,18 @@
       <tbody>
         <tr v-for="(row,y) in thudboard">
           <th>{{y+1}}</th>
-          <td v-for="cell in row">{{cell}}</td>
+          <!-- <td v-for="(cell,x) in row"
+              v-bind:class="{glow:isdwarfturn&&cell=='d'||!isdwarfturn&&cell=='T'}"> -->
+          <td v-for="(cell,x) in row" v-bind:class="{glow:x==11&&y==2}">
+            <span v-if="cell=='.'" class="dot"></span>
+            <span v-else>{{cell}}</span>
+          </td>
         </tr>
       </tbody>
+      <tfoot><tr><th colspan=16>
+        <div class="whoseturn">It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.</div>
+      </th></tr></tfoot>
     </table>
-    It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.
   </div>
 </div>
 </body>
