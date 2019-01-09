@@ -57,14 +57,19 @@
               v-bind:class="{selectable:selectable(x,y),
                              selected:selected(x,y),
                              isattack:isattack(x,y)}">
-            <span v-if="cell==' ' && selectable(x,y)" class="greendot"></span>
+            <span v-if="cell==' ' && selectable(x,y)" class="dot"></span>
             <span v-else>{{cell}}</span>
           </td>
         </tr>
       </tbody>
-      <tfoot><tr><th colspan=16>
-        <div class="whoseturn">It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.</div>
-      </th></tr></tfoot>
+      <tfoot>
+        <tr><th colspan=16>
+          <div class="status">It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.</div>
+        </th></tr>
+        <tr><th colspan=16>
+          <div class="status">{{dwarfscapt}} Dwarf{{pl(dwarfscapt)}} and {{trollscapt}} Troll{{pl(trollscapt)}} have been captured.</div>
+        </th></tr>
+      </tfoot>
     </table>
   </div>
 </div>

@@ -25,17 +25,17 @@ div.thudboard tr td.selectable {
   text-shadow: 1px 1px 2px black, 0 0 25px green, 0 0 5px darkgreen;
 }
 
-.selected {
+div.thudboard tr td.selected {
   color: lightblue;
   text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;
 }
 
-.selectable.isattack {
+div.thudboard tr td.selectable.isattack {
   color: pink;
   text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px darkred;
 }
 
-.greendot {
+.dot {
   height: 10px;
   width: 10px;
   background-color: lightgreen;
@@ -44,7 +44,16 @@ div.thudboard tr td.selectable {
   box-shadow: 1px 1px 2px black, 0 0 25px green, 0 0 5px darkgreen;
 }
 
-div.whoseturn {
+.isattack .dot {
+  height: 10px;
+  width: 10px;
+  background-color: pink;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px darkred;
+}
+
+div.status {
   text-align: center;
   font-weight: bold;
   font-size: large;
