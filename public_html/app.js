@@ -160,6 +160,7 @@ var app = new Vue({
           this.dwarfscapt += 1;
           this.curmove += showpos(x,y);
           this.isdwarfturn = ! this.isdwarfturn;
+          this.moves.push(this.curmove);
         }
         else {
           // reset troll partial move
@@ -167,7 +168,6 @@ var app = new Vue({
           Vue.set(this.thudboard[this.attackfrom.y], this.attackfrom.x, ' ');
           Vue.set(this.thudboard[this.movefrom.y], this.movefrom.x, piece);
         }
-        this.moves.push(this.curmove);
         // fall through to clear state
       }
 
