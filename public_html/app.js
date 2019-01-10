@@ -76,6 +76,14 @@ var app = new Vue({
       else if (this.selectattack) return this.legaltarget[y][x];
       else return false;
     },
+    onecapt: function (x,y) {
+      if (this.selectdest
+          && ! this.isdwarfturn
+          && this.legalattack[y][x]
+          && ! this.legalshove[y][x]
+          && this.alldwarfneighbors(coord(x,y)).length > 1) return true;
+      else return false;
+    },
     click: function (x,y) {
       if (this.selectpiece) {
         if (this.isdwarfturn && this.thudboard[y][x] == 'd'
