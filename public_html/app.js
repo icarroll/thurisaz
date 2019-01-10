@@ -20,6 +20,14 @@ function coord(x,y) {
   return {x:x,y:y};
 }
 
+function showcoord(pos) {
+  return showpos(pos.x,pos.y);
+}
+
+function showpos(x,y) {
+  return app.COLS[x] + (y+1); //XXX using app is an ugly hack :-\
+}
+
 var app = new Vue({
   data: {
     COLS: ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P'],
@@ -51,6 +59,8 @@ var app = new Vue({
     selectattack: false,
     movefrom: {x:-1,y:-1},
     attackfrom: {x:-1,y:-1},
+    curmove: 'd ',
+    moves: [],
   },
   methods: {
     selectable: function (x,y) {
@@ -96,6 +106,7 @@ var app = new Vue({
           this.selectdest = true;
           this.selectattack = false;
 
+          this.curmove += showpos(x,y) + '-';
           return;
         }
         // else fall through to clear state
@@ -105,9 +116,13 @@ var app = new Vue({
           var piece = this.thudboard[this.movefrom.y][this.movefrom.x];
           Vue.set(this.thudboard[this.movefrom.y], this.movefrom.x, ' ');
           Vue.set(this.thudboard[y], x, piece);
+
+          this.curmove += showpos(x,y);
+
           if (this.legalattack[y][x]) {
             if (this.isdwarfturn) {
               this.trollscapt += 1;
+              this.curmove += 'x' + showpos(x,y);
             }
             else {
               var attacks = this.alldwarfneighbors(coord(x,y));
@@ -115,6 +130,7 @@ var app = new Vue({
                 for (var ix=0 ; ix<attacks.length ; ix+=1) {
                   Vue.set(this.thudboard[attacks[ix].y], attacks[ix].x, ' ');
                   this.dwarfscapt += 1;
+                  this.curmove += 'x' + showcoord(attacks[ix]);
                 }
               }
               else {
@@ -126,11 +142,14 @@ var app = new Vue({
                 for (var ix=0 ; ix<attacks.length ; ix+=1) {
                   Vue.set(this.legaltarget[attacks[ix].y], attacks[ix].x, true);
                 }
+                this.curmove += 'x';
                 return;
               }
             }
           }
           this.isdwarfturn = ! this.isdwarfturn;
+
+          this.moves.push(this.curmove);
           // fall through to clear state
         }
         // else fall through to clear state
@@ -139,6 +158,7 @@ var app = new Vue({
         if (this.legaltarget[y][x]) {
           Vue.set(this.thudboard[y], x, ' ');
           this.dwarfscapt += 1;
+          this.curmove += showpos(x,y);
           this.isdwarfturn = ! this.isdwarfturn;
         }
         else {
@@ -147,10 +167,12 @@ var app = new Vue({
           Vue.set(this.thudboard[this.attackfrom.y], this.attackfrom.x, ' ');
           Vue.set(this.thudboard[this.movefrom.y], this.movefrom.x, piece);
         }
-        //fall through to clear state
+        this.moves.push(this.curmove);
+        // fall through to clear state
       }
 
       // move canceled or completed: clear state
+      this.curmove = this.isdwarfturn ? 'd ' : 'T ';
       this.movefrom = {x:-1,y:-1};
       this.attackfrom = {x:-1,y:-1};
       this.selectpiece = true;

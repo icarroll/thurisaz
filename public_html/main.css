@@ -2,6 +2,18 @@
   display: none;
 }
 
+div.game {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+div.movelist {
+}
+
+div.thudboard {
+}
+
 div.thudboard tr td {
   background-color: #ffffff;
   cursor: default;

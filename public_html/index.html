@@ -41,36 +41,45 @@
 
 <body>
 <div id="app" v-cloak>
-  <div class="thudboard">
-    <table>
-      <thead><tr>
-        <th>&THORN;</th>
-        <th v-for="COL in COLS">{{COL}}</th>
-      </tr></thead>
-      <tbody>
-        <tr v-for="(row,y) in thudboard">
-          <th>{{y+1}}</th>
-          <td v-for="(cell,x) in row"
-              v-on:click="click(x,y)"
-              v-bind:class="{selectable:selectable(x,y),
-                             selected:selected(x,y),
-                             isattack:isattack(x,y),
-                             absent:cell=='#'}">
-            <span v-if="cell==' ' && onecapt(x,y)">1</span>
-            <span v-else-if="cell==' ' && selectable(x,y)" class="dot"></span>
-            <span v-else>{{cell}}</span>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr><th colspan=16>
-          <div class="status">It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.</div>
-        </th></tr>
-        <tr><th colspan=16>
-          <div class="status">{{dwarfscapt}} Dwarf{{pl(dwarfscapt)}} and {{trollscapt}} Troll{{pl(trollscapt)}} have been captured.</div>
-        </th></tr>
-      </tfoot>
-    </table>
+  <div class="game">
+    <div class="thudboard">
+      <table>
+        <thead><tr>
+          <th>&THORN;</th>
+          <th v-for="COL in COLS">{{COL}}</th>
+        </tr></thead>
+        <tbody>
+          <tr v-for="(row,y) in thudboard">
+            <th>{{y+1}}</th>
+            <td v-for="(cell,x) in row"
+                v-on:click="click(x,y)"
+                v-bind:class="{selectable:selectable(x,y),
+                               selected:selected(x,y),
+                               isattack:isattack(x,y),
+                               absent:cell=='#'}">
+              <span v-if="cell==' ' && onecapt(x,y)">1</span>
+              <span v-else-if="cell==' ' && selectable(x,y)" class="dot"></span>
+              <span v-else>{{cell}}</span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><th colspan=16>
+            <div class="status">It is <span v-if="isdwarfturn">Dwarf's</span><span v-else>Troll's</span> turn.</div>
+          </th></tr>
+          <tr><th colspan=16>
+            <div class="status">{{dwarfscapt}} Dwarf{{pl(dwarfscapt)}} and {{trollscapt}} Troll{{pl(trollscapt)}} have been captured.</div>
+          </th></tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="movelist">
+      <b-card title="Moves:">
+        <ul class="card-text">
+          <li v-for="move in moves">{{move}}</li>
+        </ul>
+      </b-card>
+    </div>
   </div>
 </div>
 </body>
