@@ -35,7 +35,7 @@ function parsecoord(raw_pos) {
   if (isNaN(raw_y)) return [null, raw_pos];
   var y = raw_y-1;
   var newcoord = coord(x,y);
-  return [newcoord, raw_pos.slice(1+(""+y).length)];
+  return [newcoord, raw_pos.slice(1+(""+raw_y).length)];
 }
 
 function parsemove(raw_move) {
@@ -43,19 +43,24 @@ function parsemove(raw_move) {
   raw_move = raw_move.toUpperCase();
 
   var move = {};
+  console.log(move);
   if (raw_move.charAt(0) == 'D') move.isdwarfmove = true;
   else if (raw_move.charAt(0) == "T") move.isdwarfmove = false;
   else return null;
+  console.log(move);
 
   var [from,raw_dest] = parsecoord(raw_move.slice(1));
   if (from === null) return null;
   move.from = from;
+  console.log(move);
 
   if (raw_dest.charAt(0) != '-') return null;
 
   var [to,raw_attacks] = parsecoord(raw_dest.slice(1));
   if (to === null) return null;
   move.to = to;
+  console.log(move);
+  console.log(raw_attacks)
 
   move.attacks = [];
   while (raw_attacks.length != 0) {
@@ -63,7 +68,9 @@ function parsemove(raw_move) {
     var [attack,raw_attacks] = parsecoord(raw_attacks.slice(1));
     if (attack === null) return null;
     move.attacks.push(attack);
+    console.log(move);
   }
+  console.log("move parse complete");
   return move;
 }
 
@@ -80,6 +87,10 @@ function showmove(move) {
 }
 
 var app = new Vue({
+  created: function () {
+    this.socket = new WebSocket("ws://ada.cs.pdx.edu:20821/");
+    this.socket.onmessage = this.process_message;
+  },
   data: {
     iam: {dwarf:true, troll:true},
     COLS: ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P'],
@@ -115,6 +126,22 @@ var app = new Vue({
     moves: [],
   },
   methods: {
+    process_message: function (e) {
+      console.log(e.data);
+      if (e.data == 'play_dwarf') {
+        this.iam.dwarf = true;
+        this.iam.troll = false;
+      }
+      else if (e.data == 'play_troll') {
+        this.iam.dwarf = false;
+        this.iam.troll = true;
+      }
+      else if (e.data == 'observe') {
+        this.iam.dwarf = false;
+        this.iam.troll = false;
+      }
+      else this.domove(e.data);
+    },
     myturn: function () {
       if (this.isdwarfturn) return this.iam.dwarf;
       if (! this.isdwarfturn) return this.iam.troll;
@@ -157,12 +184,17 @@ var app = new Vue({
 
       this.clearmovestate();
       this.thudboard[move.from.y][move.from.x] = ' ';
-      for (var ix=0 ; ix<move.attacks ; ix+=1) {
-        this.thudboard[move.attacks[ix].y][move.attacks[ix].x] = ' ';
+      for (var ix=0 ; ix<move.attacks.length ; ix+=1) {
+        console.log("attacking " + move.attacks[ix]);
+        Vue.set(this.thudboard[move.attacks[ix].y], move.attacks[ix].x, ' ');
+        console.log(this.thudboard[move.attacks[ix].y][move.attacks[ix].x]);
+        if (move.isdwarfmove) this.trollscapt += 1;
+        if (! move.isdwarfmove) this.dwarfscapt += 1;
       }
       this.thudboard[move.to.y][move.to.x] = move.isdwarfmove ? 'd' : 'T';
       this.moves.push(showmove(move));
       this.isdwarfturn = ! move.isdwarfmove;
+      this.clearmovestate();
     },
     click: function (x,y) {
       if (this.selectpiece) {
@@ -220,6 +252,7 @@ var app = new Vue({
           this.isdwarfturn = ! this.isdwarfturn;
 
           this.moves.push(this.curmove);
+          this.socket.send(this.curmove);
           // fall through to clear state
         }
         // else fall through to clear state
@@ -231,6 +264,7 @@ var app = new Vue({
           this.curmove += showpos(x,y);
           this.isdwarfturn = ! this.isdwarfturn;
           this.moves.push(this.curmove);
+          this.socket.send(this.curmove);
         }
         else {
           // reset troll partial move
