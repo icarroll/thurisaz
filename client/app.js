@@ -81,6 +81,7 @@ function showmove(move) {
 
 var app = new Vue({
   data: {
+    iam: {dwarf:true, troll:true},
     COLS: ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P'],
     dwarfscapt: 0,
     trollscapt: 0,
@@ -114,7 +115,12 @@ var app = new Vue({
     moves: [],
   },
   methods: {
+    myturn: function () {
+      if (this.isdwarfturn) return this.iam.dwarf;
+      if (! this.isdwarfturn) return this.iam.troll;
+    },
     selectable: function (x,y) {
+      if (! this.myturn()) return false;
       if (this.selectpiece) {
         return (this.isdwarfturn && this.thudboard[y][x] == 'd'
                 || ! this.isdwarfturn && this.thudboard[y][x] == 'T');
