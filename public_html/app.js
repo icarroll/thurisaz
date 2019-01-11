@@ -28,6 +28,57 @@ function showpos(x,y) {
   return app.COLS[x] + (y+1); //XXX using app is an ugly hack :-\
 }
 
+function parsecoord(raw_pos) {
+  var x = app.COLS.indexOf(raw_pos.charAt(0));
+  if (x == -1) return [null, raw_pos];
+  var raw_y = parseInt(raw_pos.slice(1));
+  if (isNaN(raw_y)) return [null, raw_pos];
+  var y = raw_y-1;
+  var newcoord = coord(x,y);
+  return [newcoord, raw_pos.slice(1+(""+y).length)];
+}
+
+function parsemove(raw_move) {
+  raw_move = raw_move.replace(/\s+/g, '');
+  raw_move = raw_move.toUpperCase();
+
+  var move = {};
+  if (raw_move.charAt(0) == 'D') move.isdwarfmove = true;
+  else if (raw_move.charAt(0) == "T") move.isdwarfmove = false;
+  else return null;
+
+  var [from,raw_dest] = parsecoord(raw_move.slice(1));
+  if (from === null) return null;
+  move.from = from;
+
+  if (raw_dest.charAt(0) != '-') return null;
+
+  var [to,raw_attacks] = parsecoord(raw_dest.slice(1));
+  if (to === null) return null;
+  move.to = to;
+
+  move.attacks = [];
+  while (raw_attacks.length != 0) {
+    if (raw_attacks.charAt(0) != 'X') return null;
+    var [attack,raw_attacks] = parsecoord(raw_attacks.slice(1));
+    if (attack === null) return null;
+    move.attacks.push(attack);
+  }
+  return move;
+}
+
+function showmove(move) {
+  msg = move.isdwarfmove ? 'd ' : 'T ';
+  msg += showcoord(move.from);
+  msg += '-';
+  msg += showcoord(move.to);
+  for (var ix=0 ; ix<move.attacks.length ; ix+=1) {
+    msg += 'x';
+    msg += showcoord(move.attacks[ix]);
+  }
+  return msg;
+}
+
 var app = new Vue({
   data: {
     COLS: ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P'],
@@ -93,6 +144,19 @@ var app = new Vue({
           && ! this.legalshove[y][x]
           && this.alldwarfneighbors(coord(x,y)).length > 1) return true;
       else return false;
+    },
+    domove: function (raw_move) {
+      move = parsemove(raw_move);
+      if (move === null) return;
+
+      this.clearmovestate();
+      this.thudboard[move.from.y][move.from.x] = ' ';
+      for (var ix=0 ; ix<move.attacks ; ix+=1) {
+        this.thudboard[move.attacks[ix].y][move.attacks[ix].x] = ' ';
+      }
+      this.thudboard[move.to.y][move.to.x] = move.isdwarfmove ? 'd' : 'T';
+      this.moves.push(showmove(move));
+      this.isdwarfturn = ! move.isdwarfmove;
     },
     click: function (x,y) {
       if (this.selectpiece) {
@@ -172,6 +236,9 @@ var app = new Vue({
       }
 
       // move canceled or completed: clear state
+      this.clearmovestate();
+    },
+    clearmovestate: function () {
       this.curmove = this.isdwarfturn ? 'd ' : 'T ';
       this.movefrom = {x:-1,y:-1};
       this.attackfrom = {x:-1,y:-1};
