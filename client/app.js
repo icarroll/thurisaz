@@ -38,29 +38,30 @@ function parsecoord(raw_pos) {
   return [newcoord, raw_pos.slice(1+(""+raw_y).length)];
 }
 
+//TODO check validity
 function parsemove(raw_move) {
   raw_move = raw_move.replace(/\s+/g, '');
   raw_move = raw_move.toUpperCase();
 
   var move = {};
-  console.log(move);
+  //console.log(move);
   if (raw_move.charAt(0) == 'D') move.isdwarfmove = true;
   else if (raw_move.charAt(0) == "T") move.isdwarfmove = false;
   else return null;
-  console.log(move);
+  //console.log(move);
 
   var [from,raw_dest] = parsecoord(raw_move.slice(1));
   if (from === null) return null;
   move.from = from;
-  console.log(move);
+  //console.log(move);
 
   if (raw_dest.charAt(0) != '-') return null;
 
   var [to,raw_attacks] = parsecoord(raw_dest.slice(1));
   if (to === null) return null;
   move.to = to;
-  console.log(move);
-  console.log(raw_attacks)
+  //console.log(move);
+  //console.log(raw_attacks)
 
   move.attacks = [];
   while (raw_attacks.length != 0) {
@@ -68,9 +69,9 @@ function parsemove(raw_move) {
     var [attack,raw_attacks] = parsecoord(raw_attacks.slice(1));
     if (attack === null) return null;
     move.attacks.push(attack);
-    console.log(move);
+    //console.log(move);
   }
-  console.log("move parse complete");
+  //console.log("move parse complete");
   return move;
 }
 
@@ -127,7 +128,7 @@ var app = new Vue({
   },
   methods: {
     process_message: function (e) {
-      console.log(e.data);
+      //console.log(e.data);
       if (e.data == 'play_dwarf') {
         this.iam.dwarf = true;
         this.iam.troll = false;
@@ -140,7 +141,7 @@ var app = new Vue({
         this.iam.dwarf = false;
         this.iam.troll = false;
       }
-      else this.domove(e.data);
+      else this.executetheirmove(e.data);
     },
     myturn: function () {
       if (this.isdwarfturn) return this.iam.dwarf;
@@ -178,16 +179,16 @@ var app = new Vue({
           && this.alldwarfneighbors(coord(x,y)).length > 1) return true;
       else return false;
     },
-    domove: function (raw_move) {
+    executetheirmove: function (raw_move) {
       move = parsemove(raw_move);
       if (move === null) return;
 
       this.clearmovestate();
       this.thudboard[move.from.y][move.from.x] = ' ';
       for (var ix=0 ; ix<move.attacks.length ; ix+=1) {
-        console.log("attacking " + move.attacks[ix]);
+        //console.log("attacking " + move.attacks[ix]);
         Vue.set(this.thudboard[move.attacks[ix].y], move.attacks[ix].x, ' ');
-        console.log(this.thudboard[move.attacks[ix].y][move.attacks[ix].x]);
+        //console.log(this.thudboard[move.attacks[ix].y][move.attacks[ix].x]);
         if (move.isdwarfmove) this.trollscapt += 1;
         if (! move.isdwarfmove) this.dwarfscapt += 1;
       }
@@ -250,9 +251,7 @@ var app = new Vue({
             }
           }
           this.isdwarfturn = ! this.isdwarfturn;
-
-          this.moves.push(this.curmove);
-          this.socket.send(this.curmove);
+          this.executemymove(this.curmove);
           // fall through to clear state
         }
         // else fall through to clear state
@@ -263,8 +262,7 @@ var app = new Vue({
           this.dwarfscapt += 1;
           this.curmove += showpos(x,y);
           this.isdwarfturn = ! this.isdwarfturn;
-          this.moves.push(this.curmove);
-          this.socket.send(this.curmove);
+          this.executemymove(this.curmove);
         }
         else {
           // reset troll partial move
@@ -277,6 +275,10 @@ var app = new Vue({
 
       // move canceled or completed: clear state
       this.clearmovestate();
+    },
+    executemymove: function(move) {
+      this.moves.push(move);
+      this.socket.send(move);
     },
     clearmovestate: function () {
       this.curmove = this.isdwarfturn ? 'd ' : 'T ';

@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-import binascii
-import json
-import pysodium
+#import binascii
+#import json
+#import pysodium
 from websocket_server import *
 
 client_info = dict(dwarf=None, troll=None, observers=[])
